@@ -9,6 +9,7 @@ import { getNextCycle } from "../utils/getNextCycle";
 import { getNextCycleType } from "../utils/getNextCycleType";
 import { TaskActionTypes } from "../../contexts/TaskContext/taskActions";
 import { Tips } from "../Tips";
+import { showMessage } from "../../adapters/showMessage";
 
 export function MainForm() {
   const { state, dispatch } = useTaskContext();
@@ -17,15 +18,18 @@ export function MainForm() {
   //cycles
   const nextCycle = getNextCycle(state.currentCycle);
   const nextCycleType = getNextCycleType(nextCycle);
+  const lastTaskName = state.tasks[state.tasks.length - 1]?.name || "";
 
   //tips
 
   function handleCreateNewTask(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    showMessage.dismiss();
+
     if (taskNameInput.current === null) return;
     const taskName = taskNameInput.current.value.trim();
     if (!taskName) {
-      alert("Please enter a task name.");
+      showMessage.warn("Please enter a task name.");
       return;
     }
     const newTask: TaskModel = {
@@ -38,12 +42,13 @@ export function MainForm() {
       type: nextCycleType,
     };
 
-    const secondsRemaining = newTask.duration * 60; // Convert minutes to seconds
-
     dispatch({ type: TaskActionTypes.START_TASK, payload: newTask });
+    showMessage.success("Task created successfully!");
   }
 
   function handleStopTask() {
+    showMessage.dismiss();
+    showMessage.error("Task stopped!");
     dispatch({ type: TaskActionTypes.STOP_TASK });
   }
 
@@ -57,6 +62,7 @@ export function MainForm() {
           placeholder="Digite uma tarefa"
           ref={taskNameInput}
           disabled={!!state.activeTask}
+          defaultValue={lastTaskName}
         />
       </div>
 

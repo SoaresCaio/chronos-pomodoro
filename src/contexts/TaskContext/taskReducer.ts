@@ -9,18 +9,6 @@ export function taskReducer(
 ): TaskStateModel {
   switch (action.type) {
     case TaskActionTypes.START_TASK: {
-      // setState((prevState) => {
-      //   return {
-      //     ...prevState,
-      //     config: { ...prevState.config },
-      //     activeTask: newTask,
-      //     currentCycle: nextCycle,
-      //     secondsRemaining,
-      //     formattedSecondsRemaining: formatSecondsToMinutes(secondsRemaining),
-      //     tasks: [...prevState.tasks, newTask],
-      //   };
-      // });
-
       const newTask = action.payload;
       const nextCycle = getNextCycle(state.currentCycle);
       const secondsRemaining = newTask.duration * 60; // Convert minutes to seconds
@@ -34,20 +22,6 @@ export function taskReducer(
       };
     }
     case TaskActionTypes.STOP_TASK: {
-      //   return {
-      //     ...prevState,
-      //     activeTask: null,
-      //     secondsRemaining: 0,
-      //     formattedSecondsRemaining: "00:00",
-      //     tasks: prevState.tasks.map((task) => {
-      //       if (prevState.activeTask && prevState.activeTask.id === task.id) {
-      //         return {
-      //           ...task,
-      //           interruptedDate: Date.now(),
-      //         };
-      //       }
-      //       return task;
-      //     }),
       return {
         ...state,
         activeTask: null,
@@ -62,6 +36,31 @@ export function taskReducer(
           }
           return task;
         }),
+      };
+    }
+    case TaskActionTypes.COMPLETE_TASK: {
+      return {
+        ...state,
+        activeTask: null,
+        secondsRemaining: 0,
+        formattedSecondsRemaining: "00:00",
+        tasks: state.tasks.map((task) => {
+          if (state.activeTask && state.activeTask.id === task.id) {
+            return {
+              ...task,
+              completeDate: Date.now(),
+            };
+          }
+          return task;
+        }),
+      };
+    }
+    case TaskActionTypes.COUNT_DOWN: {
+      const secondsRemaining = action.payload.secondsRemaining;
+      return {
+        ...state,
+        secondsRemaining,
+        formattedSecondsRemaining: formatSecondsToMinutes(secondsRemaining),
       };
     }
   }
