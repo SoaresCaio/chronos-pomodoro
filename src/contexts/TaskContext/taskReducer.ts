@@ -1,7 +1,8 @@
 import { formatSecondsToMinutes } from "../../components/utils/formatSecontsToMinutes";
 import { getNextCycle } from "../../components/utils/getNextCycle";
-import type { TaskStateModel } from "../../models/TaskStateModel";
+import { initialTaskState } from "./initialTaskState";
 import { TaskActionTypes, type TaskActionModel } from "./taskActions";
+import type { TaskStateModel } from "../../models/TaskStateModel";
 
 export function taskReducer(
   state: TaskStateModel,
@@ -62,6 +63,15 @@ export function taskReducer(
         secondsRemaining,
         formattedSecondsRemaining: formatSecondsToMinutes(secondsRemaining),
       };
+    }
+    case TaskActionTypes.CHANGE_SETTINGS: {
+      return {
+        ...state,
+        config: { ...action.payload },
+      };
+    }
+    case TaskActionTypes.RESET_TASK: {
+      return { ...initialTaskState };
     }
   }
   return state;
